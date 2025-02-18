@@ -1,32 +1,14 @@
 "use client"
-import {JSX, useState} from "react";
+import {JSX} from "react";
+import {useForecast} from "@/hook/useForecast";
 
 export default function Layout():JSX.Element {
-    const [term, setTerm] = useState<string>('');
-    const [weatherData, setWeatherData] = useState(null);
-    const [loading, setLoading] = useState<boolean>(false);
-
-
-    const handleSearch = async() =>{
-        if (term.trim() === "") return;
-        setLoading(true);
-        try {
-            const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${term}&APPID=a81f8318707017d8d79cbd997fd62516`);
-            const data = await response.json();
-            setWeatherData(data);
-            console.log(data);
-        } catch (error) {
-            console.error("Error occurred while fetching weather", error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const {term, setTerm, weatherData, loading, handleSearch} = useForecast();
 
     const onInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setTerm(e.target.value);
         // console.log(term);
     }
-
 
     return <div className="flex justify-center items-center w-full h-[100vh] bg-sky-600">
         <section className="bg-white bg-opacity-20 backdrop-blur-ls drop-shadow-lg
@@ -46,6 +28,13 @@ export default function Layout():JSX.Element {
                     search
                 </button>
             </div>
+            {loading && <p>Loading...</p>}
+            {weatherData && (
+                <div>
+                    <h2>{weatherData.name}</h2>
+                    <p>Temperature: {weatherData.main.temp}K</p>
+                </div>
+            )}
         </section>
 
     </div>
